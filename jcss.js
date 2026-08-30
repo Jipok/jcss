@@ -326,7 +326,7 @@ borderSpacing: compact(`
 };
 
 // =========================================================================
-// 7. PREFIX HANDLERS (Variants, Breakpoints, Pseudo-classes)
+// PREFIX HANDLERS (Variants, Breakpoints, Pseudo-classes)
 // =========================================================================
 
 const media = query => ({
@@ -424,7 +424,7 @@ const PREFIX_HANDLERS = {
 };
 
 // =========================================================================
-// 8. CORE UTILITY CONFIGURATION
+// CORE UTILITY CONFIGURATION
 // =========================================================================
 
 // Meta-keys inherited by nested utility nodes using {$inherit}

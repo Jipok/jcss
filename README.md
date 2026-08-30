@@ -59,11 +59,11 @@ CSS
 <details>
 <summary><b>📖 Advanced <code>&lt;css&gt;</code> Syntax Cheatsheet (Click to expand)</b></summary>
 
-## Syntax
+### Syntax
 
-> [!IMPORTANT] 
-> Utility rules use the form `selector:variants: utilities;`.
-> A whitespace character must separate the final `:` from the utility list, and every utility rule must end with `;`
+> **Important:** Utility rules use the form `selector:variants: utilities;`.
+> A whitespace character must separate the final `:` from the utility list,
+> and every utility rule must end with `;`.
 
 ### 1. Root Element Styling (`&`)
 Use `&` to apply styles directly to the parent element containing the `<css>` tag (just like in Sass/SCSS):
