@@ -186,6 +186,116 @@ HTMX lifecycle classes can also be used as ordinary selectors inside `<css>`.
 
 ---
 
+## 🔌 VanJS Integration
+
+[VanJS](https://vanjs.org/) is ESM-first and reactive. J-CSS needs no special
+plugin — copy the snippet you need into your project. Load J-CSS first, so
+`window.J` exists.
+
+<details>
+<summary><b>Variant 1 — <code>css</code> as the first argument</b></summary>
+
+```js
+// van-jcss.js
+export const cx = (...parts) =>
+  parts.flat(Infinity).filter(x => typeof x === "string" && x).join(" ")
+
+const merge = (scope, cls) =>
+  cls == null ? scope
+  : typeof cls === "function" ? () => cx(scope, cls())
+  : typeof cls === "object" && "val" in cls ? () => cx(scope, cls.val)
+  : cx(scope, cls)
+
+// css`...` returns a props object: div(css`...`, children)
+export const css = (strings, ...rest) =>
+  Array.isArray(strings) && strings.raw
+    ? { class: J.css(String.raw(strings, ...rest)) }
+    : (s, ...v) => ({ ...strings, class: merge(J.css(String.raw(s, ...v)), strings.class) })
+```
+
+`css\`...\`` returns `{ class: scope }`, and VanJS treats a plain object as the
+props argument. The styles sit right in the markup, and the root gets the scope
+class automatically:
+
+```js
+import van from "vanjs-core"
+import { css } from "./van-jcss.js"
+
+const { div, span, pre } = van.tags
+
+const CodeBlock = (lang, code) => div(
+  css`
+    &: my-3 rounded-lg border border-gray-200;
+    .bar: flex items-center gap-2 px-3 py-1 bg-gray-100 text-xs;
+    pre: p-3 overflow-x-auto text-xs font-mono whitespace-pre-wrap;
+  `,
+  div({ class: "bar" }, span({ class: "lang" }, lang || "text")),
+  pre(code),
+)
+```
+
+For your own or a reactive `class`, pass the props into `css`:
+
+```js
+button(css({ class: () => dark.val && "ring-2" })`&: px-4;`, "Click")
+```
+
+</details>
+
+<details>
+<summary><b>Variant 2 — <code>styled(tag)</code> component wrapper</b></summary>
+
+```js
+// van-jcss.js
+export const cx = (...parts) =>
+  parts.flat(Infinity).filter(x => typeof x === "string" && x).join(" ")
+
+const merge = (scope, cls) =>
+  cls == null ? scope
+  : typeof cls === "function" ? () => cx(scope, cls())
+  : typeof cls === "object" && "val" in cls ? () => cx(scope, cls.val)
+  : cx(scope, cls)
+
+const withScope = (props, scope) => {
+  const { class: cls, ...rest } = props
+  return { ...rest, class: merge(scope, cls) }
+}
+
+export const styled = (tag, id) => (strings, ...rest) => {
+  const scope = J.css(String.raw(strings, ...rest), id)
+  return (first, ...children) => {
+    const hasProps = Object.getPrototypeOf(first ?? 0) === Object.prototype
+    return tag(withScope(hasProps ? first : {}, scope), ...(hasProps ? children : [first, ...children]))
+  }
+}
+```
+
+```js
+import van from "vanjs-core"
+import { styled } from "./van-jcss.js"
+
+const { div, span } = van.tags
+
+const Card = styled(div)`&: p-4 bg-white rounded-xl shadow-md;`
+Card({ class: "extra" }, "…")
+
+// a stable scope name instead of j-css-N (nice for HMR):
+const Icon = styled(span, "icon")`&::after { content: "\f00c"; }`
+```
+
+</details>
+
+**Notes**
+
+- `css` must be the **first** argument of a tag — it *is* the props object.
+- Both variants merge a reactive root `class` (`class: state` or `class: () => …`).
+  A static one works too — in variant 1 pass it to `css({ class: "x" })`.
+- VanJS core does not flatten arrays returned from a function child. For reactive
+  lists use [VanX](https://vanjs.org/x) `list()`, or
+  `van.derive(() => container.replaceChildren(...items.val.map(…)))`.
+
+---
+
 ## ⚙️ Engine Options (`window.J`)
 
 Configure J-CSS **before** loading the script:
