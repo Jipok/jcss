@@ -2590,14 +2590,14 @@ function compileCss(text, scopeClass) {
 
             // Split the line into two parts on the first colon followed by a space.
             // This is a reliable way to separate the selector/prefix part from the utility class list.
-            const parts = trimmedLine.split(/:\s+/, 2);
-            if (parts.length < 2) {
+            const lineMatch = trimmedLine.match(/^(.*?):\s+(.*)$/s);
+            if (!lineMatch) {
                 cssWarn(trimmedLine, `[j-css] Can't parse line '${trimmedLine}', no ': ' found`)
                 continue
             };
 
-            const selectorAndPrefixes = parts[0];
-            const classesString = parts[1];
+            const selectorAndPrefixes = lineMatch[1];
+            const classesString = lineMatch[2];
 
             const selectorParts = selectorAndPrefixes.split(':');
             let firstPrefixIndex = selectorParts.length;
@@ -2652,46 +2652,6 @@ function appendStyleTag(id, text = '') {
     style.textContent = text;
     document.head.appendChild(style);
     return style;
-}
-
-let scopeCount = 0;
-
-/**
- * Processes a single <css> tag at compile time.
- * @param {HTMLElement} node - The <css> element itself.
- * @param {HTMLElement} parent - The parent element to which the styles will be scoped.
- */
-J.processCssNode = function(node, parent) {
-    const rawCss = node.textContent;
-
-    const userProvidedId = node.getAttribute('id');
-    const SCOPE_PREFIX = 'j-css-';
-    let cssScope;
-
-    if (userProvidedId) {
-        cssScope = `${SCOPE_PREFIX}${userProvidedId}`;
-    } else {
-        scopeCount++;
-        cssScope = `${SCOPE_PREFIX}${scopeCount}`;
-    }
-
-    // Apply the generated scope class to the parent element
-    parent.classList.add(cssScope);
-    // Compile the custom syntax into standard CSS, scoped with our class
-    const compiledCss = compileCss(rawCss, '.' + cssScope);
-
-    let styleElement = document.getElementById(cssScope);
-    if (!styleElement) {
-        styleElement = appendStyleTag(cssScope)
-    }
-    styleElement.textContent = compiledCss;
-
-    if (J.CleanDOM) {
-        // Make node to avoid linker index error
-        node.replaceWith(document.createComment(''));
-    } else {
-        node.hidden = true;
-    }
 }
 
 // Create a style tag to temporarily disable all transitions during initial rendering.
@@ -2819,6 +2779,45 @@ const generatedUtilityClasses = new Set();
 const knownUtilityClasses = new Set();
 
 let utilityStyleElement = null;
+
+const scopedStyles = new Map();
+let scopeCount = 0;
+
+/**
+ * Registers a scoped stylesheet and returns its scope class.
+ * Anonymous scopes are deduplicated by text, named scopes are reused by id.
+ * Usable as J.css(text), J.css(text, id) and J.css`...`
+ */
+J.css = function (strings, ...rest) {
+    const tagged = Array.isArray(strings) && hasOwn(strings, 'raw');
+    const text = tagged ? String.raw(strings, ...rest) : String(strings);
+    let id = tagged ? '' : String(rest[0] ?? '');
+
+    if (id && !/^[\w-]+$/.test(id)) {
+        cssWarn(id, `[j-css] Invalid css id "${id}", using an anonymous scope`);
+        id = '';
+    }
+
+    const key = id ? `id:${id}` : `text:${text}`;
+    const prev = scopedStyles.get(key);
+    if (prev?.text === text && prev.style.parentNode === document.head) return prev.scope;
+
+    const scope = prev?.scope ?? (id ? `j-css-${id}` : `j-css-${++scopeCount}`);
+    const style = prev?.style ?? document.getElementById(scope) ?? appendStyleTag(scope);
+
+    // Component styles go before utilities so utilities win on equal specificity.
+    // Updates keep their slot; only new and reconnected styles are (re)inserted.
+    if (!prev || prev.style.parentNode !== document.head) {
+        utilityStyleElement ||= appendStyleTag('j-css-utilities');
+        document.head.insertBefore(style, utilityStyleElement);
+    }
+
+    const css = compileCss(text, '.' + scope);
+    if (style.textContent !== css) style.textContent = css;
+
+    scopedStyles.set(key, { scope, text, style });
+    return scope;
+};
 
 // PREFIX_HANDLERS is already declared in the intended cascade order
 const PREFIX_ORDER = new Map(
@@ -3088,7 +3087,15 @@ if (J.CSSTagMode) {
         }
 
         processedCssNodes.add(node);
-        J.processCssNode(node, parent);
+
+        parent.classList.add(J.css(node.textContent, node.getAttribute('id')));
+
+        if (J.CleanDOM) {
+            // Keep a comment node in place of the tag
+            node.replaceWith(document.createComment(''));
+        } else {
+            node.hidden = true;
+        }
     }
 
     function scanStandaloneCssTags(root = document) {
