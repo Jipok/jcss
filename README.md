@@ -66,7 +66,7 @@ CSS
 > and every utility rule must end with `;`.
 
 ### 1. Root Element Styling (`&`)
-Use `&` to apply styles directly to the parent element containing the `<css>` tag (just like in Sass/SCSS):
+Use `&` to apply styles directly to the parent element containing the `<css>` tag. It is replaced by the generated scope class (nesting is not supported):
 ```html
 <div>
   <css>
@@ -155,7 +155,9 @@ an ancestor, so `span` becomes `.j-css-1 span`.
 </css>
 ```
 
-Complex nested at-rules are not currently supported inside `<css>`.
+Nesting is **not** supported inside `<css>`.
+At-rules (`@media`, `@supports`, …) are not supported inside `<css>` either;
+use the responsive and dark prefixes on utility rules instead.
 </details>
 
 ---

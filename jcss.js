@@ -2582,6 +2582,10 @@ function compileCss(text, scopeClass) {
         if (native_selector !== undefined) {
             const trimmedSelector = native_selector.trim();
             if (trimmedSelector) {
+                if (trimmedSelector[0] === '@' || native_body.includes('{')) {
+                    cssWarn(trimmedSelector, `[j-css] Nested rules and at-rules are not supported inside <css>: '${trimmedSelector} { ... }'`);
+                    continue;
+                }
                 // Re-scope native CSS selectors with the component's unique scope class
                 const scopedSelector = splitSelectorList(trimmedSelector)
                     .map(s => {
