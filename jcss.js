@@ -2964,9 +2964,8 @@ function generateAndInjectCssForClasses(classNames) {
             const keys = Object.keys(UTILITY_CONFIG).filter(k => k[0] !== '$');
             const badVariant = parts.find(p => !getPrefixHandler(p));
             const family = keys.find(k => utility === k || utility.startsWith(k + '-'));
-            const stem = utility.replace(/-(?:\[.*\]|[^-]+)$/, '');
-            const similar = !family && stem.length > 2 &&
-                keys.find(k => k.startsWith(stem) || stem.startsWith(k));
+            const similar = !family && utility.length > 2 &&
+                keys.find(k => k.length > 2 && (k.startsWith(utility) || utility.startsWith(k)));
 
             if (badVariant)
                 cssWarn(className, `[j-css] Unknown variant "${badVariant}" in "${className}"`);
