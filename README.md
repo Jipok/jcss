@@ -142,7 +142,8 @@ By default, scopes are generated automatically (`.j-css-1`, `.j-css-2`). You can
 ### 6. Native CSS Blocks
 
 Simple native CSS rules can be mixed with utility rules. Their selectors
-are scoped to the component automatically.
+are scoped to the component automatically: the scope class is prepended as
+an ancestor, so `span` becomes `.j-css-1 span`.
 
 ```html
 <css>
@@ -156,6 +157,8 @@ are scoped to the component automatically.
 
 Complex nested at-rules are not currently supported inside `<css>`.
 </details>
+
+---
 
 ## Dynamic HTML
 

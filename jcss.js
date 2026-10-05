@@ -2270,6 +2270,14 @@ const applySelectorHandler = (selectors, handler) =>
 const splitVariants = s =>
     s.match(/(?:\[[^\]]*]|[^:])+/g) ?? [];
 
+// The scope class is prepended to the whole selector, so a raw document-level
+// context (`:root`/`html`/`body`/`.dark`) can't match from inside the component.
+const DOC_LEVEL_CONTEXT = /^(:root|html|body|\.dark)\b/i;
+function warnDocumentLevelScope(selector, scopeClass) {
+    if (!selector.includes('&') && DOC_LEVEL_CONTEXT.test(selector))
+        cssWarn(selector, `[j-css] Selector "${selector}" can't match when scoped as "${scopeClass} ${selector}"; anchor the component with "&" instead.`);
+}
+
 /**
  * The core CSS generation logic, refactored from compileCss.
  * It takes a map of selectors to utility classes and returns the compiled CSS string.
@@ -2290,6 +2298,7 @@ function generateCssFromRules(rules, scopeClass = null) {
             // Logic for <css> tags - add scope selector
             for (let i = 0; i < baseSelectorParts.length; i++) {
                 const part = baseSelectorParts[i].trim();
+                warnDocumentLevelScope(part, scopeClass);
                 baseSelectorParts[i] = part.includes('&') ? part.replaceAll('&', scopeClass) : `${scopeClass} ${part}`;
             }
         }
@@ -2575,10 +2584,12 @@ function compileCss(text, scopeClass) {
             if (trimmedSelector) {
                 // Re-scope native CSS selectors with the component's unique scope class
                 const scopedSelector = splitSelectorList(trimmedSelector)
-                    .map(s => s.includes('&')
-                         ? s.replaceAll('&', () => scopeClass)
-                         : `${scopeClass} ${s}`
-                    )
+                    .map(s => {
+                        warnDocumentLevelScope(s, scopeClass);
+                        return s.includes('&')
+                            ? s.replaceAll('&', () => scopeClass)
+                            : `${scopeClass} ${s}`;
+                    })
                     .join(', ');
                 nativeCssBlocks.push(`${scopedSelector} {${native_body}}`);
             }
