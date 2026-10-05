@@ -378,6 +378,18 @@ You can add custom utilities, colors, and prefixes(like specific media queries) 
 </script>
 ```
 
+<details>
+<summary><b>⚙️ Programmatic API (Click to expand)</b></summary>
+
+The DOM is observed automatically, so most apps need nothing else. The public
+surface is small:
+
+- `J.css(text, id?)` — registers a scoped `<css>` stylesheet and returns the scope class.
+- `J.processClasses(classes)` — registers utility classes (a string or an iterable) and regenerates the stylesheet synchronously. Works with `CSSClassMode: false`.
+- `J.scan(root = document)` — collects classes from a DOM subtree (e.g. a detached fragment) and registers them.
+
+</details>
+
 ## Disclaimer
 
 J-CSS is intended as a lightweight runtime engine for Tailwind-style interfaces, not a 1:1 replacement for the Tailwind CLI/compiler.

@@ -2904,7 +2904,7 @@ function compareUtilityTokens(a, b) {
     return a < b ? -1 : 1;
 }
 
-J.rebuildUtilityStylesheet = function() {
+function rebuildUtilityStylesheet() {
     const rules = new Map();
 
     const classNames = [...knownUtilityClasses]
@@ -2919,6 +2919,20 @@ J.rebuildUtilityStylesheet = function() {
     utilityStyleElement.textContent =
         generateCssFromRules(rules);
 }
+
+/**
+ * Registers utility classes and immediately regenerates the utility stylesheet.
+ * Accepts a whitespace-separated string or any iterable of class names.
+ * Works even with `CSSClassMode: false` (observer disabled).
+ */
+J.processClasses = c => c && generateAndInjectCssForClasses(typeof c === 'string' ? c.trim().split(/\s+/) : c);
+
+/**
+ * Collects classes from a DOM subtree (element, fragment or document) and
+ * registers them via J.processClasses. Useful for detached or freshly built
+ * nodes, without waiting for the MutationObserver.
+ */
+J.scan = (root = document) => J.processClasses(collectClasses(root));
 
 /**
  * Checks whether a class can produce at least one CSS rule.
@@ -2936,7 +2950,6 @@ function isKnownUtilityToken(token) {
 }
 
 function generateAndInjectCssForClasses(classNames) {
-    if (!J.CSSClassMode) return;
     const start = J.CSSPerformance ? performance.now() : 0;
     const before = knownUtilityClasses.size;
     let hasNewUtilities = false;
@@ -2986,7 +2999,7 @@ function generateAndInjectCssForClasses(classNames) {
         hasNewUtilities = true
     }
 
-    if (hasNewUtilities) J.rebuildUtilityStylesheet();
+    if (hasNewUtilities) rebuildUtilityStylesheet();
 
     if (J.CSSPerformance) console.debug(
         `[j-css] ${classNames.size} classes found, ` +
