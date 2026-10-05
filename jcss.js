@@ -2876,43 +2876,24 @@ function compareOrderPaths(a, b) {
     return a.length - b.length;
 }
 
-function compareUtilityTokens(a, b) {
-    if (a === b) return 0;
-
-    const partsA = splitVariants(a)
-    const partsB = splitVariants(b)
-
-    const utilityA = partsA.pop();
-    const utilityB = partsB.pop();
-
-    // Variants are compared before utilities so media groups are emitted in breakpoint order rather than lexicographic order
-    let difference = compareOrderPaths(
-        partsA.map(getPrefixRank),
-        partsB.map(getPrefixRank)
-    );
-
-    if (difference !== 0) {
-        return difference;
-    }
-
-    difference = compareOrderPaths(
-        resolveUtility(utilityA)?.order ?? [Number.MAX_SAFE_INTEGER],
-        resolveUtility(utilityB)?.order ?? [Number.MAX_SAFE_INTEGER]
-    );
-
-    if (difference !== 0) {
-        return difference;
-    }
-
-    // Ensure a deterministic order for values from the same utility branch
-    return a < b ? -1 : 1;
-}
-
 function rebuildUtilityStylesheet() {
     const rules = new Map();
+    const meta = new Map();
 
-    const classNames = [...knownUtilityClasses]
-        .sort(compareUtilityTokens);
+    // Precompute variant ranks and utility order once per class: the comparator
+    // below runs O(n log n) times, and splitVariants/resolveUtility should not.
+    for (const className of knownUtilityClasses) {
+        const parts = splitVariants(className);
+        const utility = parts.pop();
+        meta.set(className, [parts.map(getPrefixRank), resolveUtility(utility)?.order ?? [9e15]]);
+    }
+
+    const classNames = [...knownUtilityClasses].sort((a, b) => {
+        const mA = meta.get(a), mB = meta.get(b);
+        return compareOrderPaths(mA[0], mB[0])
+            || compareOrderPaths(mA[1], mB[1])
+            || (a < b ? -1 : 1);
+    });
 
     for (const className of classNames) {
         rules.set(`.${CSS.escape(className)}`, [className]);
