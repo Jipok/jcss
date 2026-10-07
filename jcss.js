@@ -2713,97 +2713,91 @@ if (J.AutoDarkMode !== false) {
 
 // Minified preflight.css + animations
 appendStyleTag('j-css-preflight', `
-    :root{--font-sans:ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';--font-serif:ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;--font-mono:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace}*,::after,::backdrop,::before,::file-selector-button{box-sizing:border-box;margin:0;padding:0;border:0 solid #e5e7eb}:host,html{line-height:1.5;-webkit-text-size-adjust:none;tab-size:4;font-family:var( --font-sans, ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' );font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;-webkit-text-decoration:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:var( --font-mono, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace );font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-0.25em}sup{top:-0.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}:-moz-focusring{outline:auto}progress{vertical-align:baseline}summary{display:list-item}menu,ol,ul{list-style:none}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}::file-selector-button,button,input,optgroup,select,textarea{font:inherit;font-feature-settings:inherit;font-variation-settings:inherit;letter-spacing:inherit;color:inherit;border-radius:0;background-color:transparent;opacity:1}:where(select:is([multiple],[size])) optgroup{font-weight:bolder}:where(select:is([multiple],[size])) optgroup option{padding-inline-start:20px}::file-selector-button{margin-inline-end:4px}::placeholder{opacity:1}@supports (not (-webkit-appearance:-apple-pay-button)) or (contain-intrinsic-size:1px){::placeholder{color:color-mix(in oklab, currentcolor 50%, transparent)}}textarea{resize:vertical}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-date-and-time-value{min-height:1lh;text-align:inherit}::-webkit-datetime-edit{display:inline-flex}::-webkit-datetime-edit-fields-wrapper{padding:0}::-webkit-datetime-edit,::-webkit-datetime-edit-day-field,::-webkit-datetime-edit-hour-field,::-webkit-datetime-edit-meridiem-field,::-webkit-datetime-edit-millisecond-field,::-webkit-datetime-edit-minute-field,::-webkit-datetime-edit-month-field,::-webkit-datetime-edit-second-field,::-webkit-datetime-edit-year-field{padding-block:0}::-webkit-calendar-picker-indicator{line-height:1}:-moz-ui-invalid{box-shadow:none}button,input:where([type='button'],[type='reset'],[type='submit']),::file-selector-button{appearance:button}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[hidden]:where(:not([hidden='until-found'])){display:none !important}
-    .container{width:100%}
-    @media(min-width:40rem){.container{max-width:40rem}}
-    @media(min-width:48rem){.container{max-width:48rem}}
-    @media(min-width:64rem){.container{max-width:64rem}}
-    @media(min-width:80rem){.container{max-width:80rem}}
-    @media(min-width:96rem){.container{max-width:96rem}}
-
-    @keyframes spin {
-        from { transform: rotate(0deg); }
-        to { transform: rotate(360deg); }
-    }
-    @keyframes pulse {
-        50% { opacity: .5; }
-    }
-    @keyframes bounce {
-        0%, 100% {
-        transform: translateY(-25%);
-        animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
-        }
-        50% {
-        transform: translateY(0);
-        animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
-        }
-    }
-    @keyframes ping {
-        75%, 100% {
-        transform: scale(2);
-        opacity: 0;
-        }
-    }
-    /* A custom animation, as an example */
-    @keyframes fade {
-        0%, 100% { opacity: 1; }
-        50% { opacity: 0.5; }
-    }
-
-    /* j-transition="fade" */
-    .fade-enter-active,
-    .fade-leave-active {
-        transition: opacity 0.3s ease;
-    }
-    .fade-enter-from,
-    .fade-leave-to {
-        opacity: 0;
-    }
-
-    /* j-transition="slide-up" */
-    .slide-up-enter-active,
-    .slide-up-leave-active {
-        transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), opacity 0.3s ease;
-    }
-    .slide-up-enter-from,
-    .slide-up-leave-to {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-
-    /* j-transition="zoom" */
-    .zoom-enter-active,
-    .zoom-leave-active {
-        /* cubic-bezier дает легкий эффект пружинки (bounce-back) в конце */
-        transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
-    }
-    .zoom-enter-from,
-    .zoom-leave-to {
-        opacity: 0;
-        transform: scale(0.9);
-    }
-
-    /* j-transition="bounce-in" */
-    .bounce-in-enter-active {
-        animation: bounce-in-keyframe 0.4s;
-    }
-    .bounce-in-leave-active {
-        animation: bounce-in-keyframe 0.4s reverse;
-    }
-    @keyframes bounce-in-keyframe {
-        0% {
-            transform: scale(0);
-            opacity: 0;
-        }
-        50% {
-            transform: scale(1.1);
-        }
-        100% {
-            transform: scale(1);
-            opacity: 1;
-        }
-    }
-
+:root{--font-sans:ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';--font-serif:ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;--font-mono:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace}*,::after,::backdrop,::before,::file-selector-button{box-sizing:border-box;margin:0;padding:0;border:0 solid #e5e7eb}:host,html{line-height:1.5;-webkit-text-size-adjust:none;tab-size:4;font-family:var( --font-sans, ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' );font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;-webkit-text-decoration:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:var( --font-mono, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace );font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-0.25em}sup{top:-0.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}:-moz-focusring{outline:auto}progress{vertical-align:baseline}summary{display:list-item}menu,ol,ul{list-style:none}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}::file-selector-button,button,input,optgroup,select,textarea{font:inherit;font-feature-settings:inherit;font-variation-settings:inherit;letter-spacing:inherit;color:inherit;border-radius:0;background-color:transparent;opacity:1}:where(select:is([multiple],[size])) optgroup{font-weight:bolder}:where(select:is([multiple],[size])) optgroup option{padding-inline-start:20px}::file-selector-button{margin-inline-end:4px}::placeholder{opacity:1}@supports (not (-webkit-appearance:-apple-pay-button)) or (contain-intrinsic-size:1px){::placeholder{color:color-mix(in oklab, currentcolor 50%, transparent)}}textarea{resize:vertical}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-date-and-time-value{min-height:1lh;text-align:inherit}::-webkit-datetime-edit{display:inline-flex}::-webkit-datetime-edit-fields-wrapper{padding:0}::-webkit-datetime-edit,::-webkit-datetime-edit-day-field,::-webkit-datetime-edit-hour-field,::-webkit-datetime-edit-meridiem-field,::-webkit-datetime-edit-millisecond-field,::-webkit-datetime-edit-minute-field,::-webkit-datetime-edit-month-field,::-webkit-datetime-edit-second-field,::-webkit-datetime-edit-year-field{padding-block:0}::-webkit-calendar-picker-indicator{line-height:1}:-moz-ui-invalid{box-shadow:none}button,input:where([type='button'],[type='reset'],[type='submit']),::file-selector-button{appearance:button}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[hidden]:where(:not([hidden='until-found'])){display:none !important}
+.container{width:100%}
+@media(min-width:40rem){.container{max-width:40rem}}
+@media(min-width:48rem){.container{max-width:48rem}}
+@media(min-width:64rem){.container{max-width:64rem}}
+@media(min-width:80rem){.container{max-width:80rem}}
+@media(min-width:96rem){.container{max-width:96rem}}
+@keyframes spin {
+from { transform: rotate(0deg); }
+to { transform: rotate(360deg); }
+}
+@keyframes pulse {
+50% { opacity: .5; }
+}
+@keyframes bounce {
+0%, 100% {
+transform: translateY(-25%);
+animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+}
+50% {
+transform: translateY(0);
+animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+}
+}
+@keyframes ping {
+75%, 100% {
+transform: scale(2);
+opacity: 0;
+}
+}
+/* A custom animation, as an example */
+@keyframes fade {
+0%, 100% { opacity: 1; }
+50% { opacity: 0.5; }
+}
+/* j-transition="fade" */
+.fade-enter-active,
+.fade-leave-active {
+transition: opacity 0.3s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+opacity: 0;
+}
+/* j-transition="slide-up" */
+.slide-up-enter-active,
+.slide-up-leave-active {
+transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), opacity 0.3s ease;
+}
+.slide-up-enter-from,
+.slide-up-leave-to {
+opacity: 0;
+transform: translateY(20px);
+}
+/* j-transition="zoom" */
+.zoom-enter-active,
+.zoom-leave-active {
+/* cubic-bezier дает легкий эффект пружинки (bounce-back) в конце */
+transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
+}
+.zoom-enter-from,
+.zoom-leave-to {
+opacity: 0;
+transform: scale(0.9);
+}
+/* j-transition="bounce-in" */
+.bounce-in-enter-active {
+animation: bounce-in-keyframe 0.4s;
+}
+.bounce-in-leave-active {
+animation: bounce-in-keyframe 0.4s reverse;
+}
+@keyframes bounce-in-keyframe {
+0% {
+transform: scale(0);
+opacity: 0;
+}
+50% {
+transform: scale(1.1);
+}
+100% {
+transform: scale(1);
+opacity: 1;
+}
+}
 `)
 
 
