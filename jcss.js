@@ -260,6 +260,9 @@ function looksLikeColor(value) {
            /^hsla?\(/.test(value)
 }
 
+// Renames *-width props to *-color (e.g. border-t-width -> border-t-color)
+const toColorProp = p => Array.isArray(p) ? p.map(v => v.replace('width', 'color')) : p.replace('width', 'color');
+
 const hasOwn = (object, key) => Object.prototype.hasOwnProperty.call(object, key);
 
 // =========================================================================
@@ -328,6 +331,9 @@ borderSpacing: compact(`
 // =========================================================================
 // PREFIX HANDLERS (Variants, Breakpoints, Pseudo-classes)
 // =========================================================================
+
+const aria = a => ({ type: 'pseudo', handler: s => `${s}[aria-${a}="true"]` });
+const ARIA_STATES = ['checked', 'disabled', 'expanded', 'hidden', 'pressed', 'readonly', 'required', 'selected'];
 
 const media = query => ({
     type: 'wrapper', // Wraps the entire CSS rule in an at-rule (e.g., a @media query)
@@ -409,14 +415,7 @@ const PREFIX_HANDLERS = {
     'rtl': { type: 'pseudo', handler: (s) => `[dir="rtl"] ${s}` },
     'ltr': { type: 'pseudo', handler: (s) => `[dir="ltr"] ${s}` },
     // Aria attributes (only for "true" values, as this is most common)
-    'aria-checked':  { type: 'pseudo', handler: (s) => `${s}[aria-checked="true"]`},
-    'aria-disabled': { type: 'pseudo', handler: (s) => `${s}[aria-disabled="true"]`},
-    'aria-expanded': { type: 'pseudo', handler: (s) => `${s}[aria-expanded="true"]`},
-    'aria-hidden':   { type: 'pseudo', handler: (s) => `${s}[aria-hidden="true"]`},
-    'aria-pressed':  { type: 'pseudo', handler: (s) => `${s}[aria-pressed="true"]`},
-    'aria-readonly': { type: 'pseudo', handler: (s) => `${s}[aria-readonly="true"]`},
-    'aria-required': { type: 'pseudo', handler: (s) => `${s}[aria-required="true"]`},
-    'aria-selected': { type: 'pseudo', handler: (s) => `${s}[aria-selected="true"]`},
+    ...Object.fromEntries(ARIA_STATES.map(a => [`aria-${a}`, aria(a)])),
 
     // --- CUSTOM ---
     'dark':  { type: 'pseudo', handler: (selector) => `html.dark ${selector}` },
@@ -1637,12 +1636,7 @@ const UTILITY_CONFIG = {
         // This function receives the generated CSS color value and modifies the context.
         $color: (colorName, opacity, context) => {
             context.$base = undefined
-            if (Array.isArray(context.$prop)) {
-                // e.g., ['border-left-width', 'border-right-width'] -> ['border-left-color', 'border-right-color']
-                context.$prop = context.$prop.map(p => p.replace('width', 'color'));
-            } else {
-                context.$prop = context.$prop.replace('width', 'color');
-            }
+            context.$prop = toColorProp(context.$prop);
             if (opacity != null) {
                 context.$base = `--j-border-opacity: ${opacity.toFixed(3)}`
             }
@@ -1657,11 +1651,7 @@ const UTILITY_CONFIG = {
         $arbitrary: (value, context) => {
             if (looksLikeColor(value)) {
                 context.$base = undefined
-                if (Array.isArray(context.$prop)) {
-                    context.$prop = context.$prop.map(p => p.replace('width', 'color'));
-                } else {
-                    context.$prop = context.$prop.replace('width', 'color');
-                }
+                context.$prop = toColorProp(context.$prop);
             }
             return value;
         },
