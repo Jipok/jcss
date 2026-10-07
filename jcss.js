@@ -1227,14 +1227,20 @@ const UTILITY_CONFIG = {
             // This creates a transparent version of the exact 'from' color, preserving the hue.
             const toColor = `rgb(from ${fromColor} r g b / 0)`;
             return compact(`
-                --j-gradient-from: ${fromColor};
-                --j-gradient-to: ${toColor};
+                --j-gradient-from: ${fromColor} var(--j-gradient-from-position, 0%);
+                --j-gradient-to: ${toColor} var(--j-gradient-to-position, 100%);
                 --j-gradient-stops: var(--j-gradient-from), var(--j-gradient-to);
             `);
         },
         $arbitrary: (value, context) => { // Handle from-[color]
             context.$prop = '--j-gradient-from';
             return value;
+        },
+        $default: (value, context) => { // Handle from-10%
+            if (/^[\d.]+%$/.test(value)) {
+                context.$prop = '--j-gradient-from-position';
+                return value;
+            }
         }
     },
     'via': {
@@ -1244,22 +1250,33 @@ const UTILITY_CONFIG = {
             const viaColor = generateColorCss(color, opacity);
             const toColor = `rgb(from ${viaColor} r g b / 0)`;
             return compact(`
-                --j-gradient-via: ${viaColor};
-                --j-gradient-to: ${toColor};
+                --j-gradient-via: ${viaColor} var(--j-gradient-via-position, 50%);
+                --j-gradient-to: ${toColor} var(--j-gradient-to-position, 100%);
                 --j-gradient-stops: var(--j-gradient-from), var(--j-gradient-via), var(--j-gradient-to);
             `);
         },
         $arbitrary: (value, context) => { // Handle via-[color]
             context.$prop = '--j-gradient-via';
             return value;
+        },
+        $default: (value, context) => { // Handle via-30%
+            if (/^[\d.]+%$/.test(value)) {
+                context.$prop = '--j-gradient-via-position';
+                return value;
+            }
         }
     },
     'to': {
-        // TODO: Percentage values do not yield the same result as Tailwind (e.g., bg-gradient-to-r from-indigo-500 to-50)
         // Only sets the final color, overriding any defaults set by `from` or `via`.
         $prop: '--j-gradient-to',
-        $color: (color, opacity) => generateColorCss(color, opacity),
+        $color: (color, opacity) => `${generateColorCss(color, opacity)} var(--j-gradient-to-position, 100%)`,
         $arbitrary: (value) => value, // Handle to-[color]
+        $default: (value, context) => { // Handle to-90%
+            if (/^[\d.]+%$/.test(value)) {
+                context.$prop = '--j-gradient-to-position';
+                return value;
+            }
+        }
     },
 
     // --- Transforms ---
