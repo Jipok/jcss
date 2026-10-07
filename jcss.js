@@ -569,6 +569,10 @@ const UTILITY_CONFIG = {
     },
 
     'flex': {
+        $arbitrary: (value, context) => {
+            context.$prop = 'flex';
+            return value;
+        },
         '': 'display: flex',
         'row': 'flex-direction: row',
         'row-reverse': 'flex-direction: row-reverse',
@@ -931,6 +935,11 @@ const UTILITY_CONFIG = {
     },
 
     'font': {
+        // Arbitrary value: a bare number is a weight, otherwise a family.
+        $arbitrary: (value, context) => {
+            context.$prop = /^\d/.test(value) ? 'font-weight' : 'font-family';
+            return value;
+        },
         // Font Family
         'sans': "font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
         'serif': "font-family: ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif",
@@ -981,7 +990,8 @@ const UTILITY_CONFIG = {
         'none': '1', 'tight': '1.25', 'snug': '1.375',
         'normal': '1.5', 'relaxed': '1.625', 'loose': '2',
         '': '1.5',
-        $num: TRANSFORMERS.rem
+        $num: TRANSFORMERS.rem,
+        $arbitrary: true
     },
     'tracking': {
         $prop: 'letter-spacing',
@@ -1075,6 +1085,7 @@ const UTILITY_CONFIG = {
     'hyphens': { $prop: 'hyphens', $values: ['none', 'manual', 'auto'] },
 
     'antialiased': '-webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale',
+    'subpixel-antialiased': '-webkit-font-smoothing: auto; -moz-osx-font-smoothing: auto',
 
     'text-shadow': {
         $prop: 'text-shadow',
@@ -1314,6 +1325,12 @@ const UTILITY_CONFIG = {
     },
 
     // --- Transitions & Animation ---
+    'will-change': {
+        $prop: 'will-change',
+        $values: ['auto', 'scroll-position', 'contents', 'transform'],
+        $arbitrary: true,
+    },
+
     'transition': {
         $prop: 'transition-property',
         $base: BASE_CSS.transition,
@@ -1425,6 +1442,15 @@ const UTILITY_CONFIG = {
                 ctx.$prop = '--j-ring-width';
                 return '1px';
             }
+        },
+        // Arbitrary value: colour-ish → ring colour, otherwise width.
+        $arbitrary: (value, context) => {
+            if (looksLikeColor(value)) {
+                context.$prop = '--j-ring-color';
+                return value;
+            }
+            context.$prop = '--j-ring-width';
+            return /^[\d.]+$/.test(value) ? value + 'px' : value;
         },
         $color: (colorName, opacity, context) => {
             context.$prop = '--j-ring-color';
