@@ -458,6 +458,8 @@ const UTILITY_CONFIG = {
         'flex': 'display: inline-flex',
         'grid': 'display: inline-grid',
     },
+    'inline-table': 'display: inline-table',
+    'list-item': 'display: list-item',
     'flow-root': 'display: flow-root',
     'contents': 'display: contents',
     'box-border': 'box-sizing: border-box',
@@ -1939,8 +1941,17 @@ const UTILITY_CONFIG = {
 
     // --- Tables ---
     'table': {
+        '': 'display: table',
         'auto': 'table-layout: auto',
         'fixed': 'table-layout: fixed',
+        'row': 'display: table-row',
+        'cell': 'display: table-cell',
+        'caption': 'display: table-caption',
+        'column': 'display: table-column',
+        'column-group': 'display: table-column-group',
+        'header-group': 'display: table-header-group',
+        'footer-group': 'display: table-footer-group',
+        'row-group': 'display: table-row-group',
     },
     'caption': {
         $prop: 'caption-side',
