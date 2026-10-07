@@ -2249,15 +2249,17 @@ function _resolveUtility(className) {
 }
 
 
-const cssGenerationCache = new Map();
+// Memoizes a single-argument pure function with a Map cache.
+const memo = fn => {
+    const cache = new Map();
+    return key => {
+        if (!cache.has(key)) cache.set(key, fn(key));
+        return cache.get(key);
+    };
+};
 
 // Parses a utility class name and generates the corresponding CSS rules.
-function resolveUtility(className) {
-    if (!cssGenerationCache.has(className)) {
-        cssGenerationCache.set(className, _resolveUtility(className))
-    }
-    return cssGenerationCache.get(className);
-}
+const resolveUtility = memo(_resolveUtility);
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -2569,13 +2571,7 @@ function _getPrefixHandler(prefix) {
 }
 
 
-const prefixHandlerCache = new Map();
-function getPrefixHandler(prefix) {
-    if (!prefixHandlerCache.has(prefix)) {
-        prefixHandlerCache.set(prefix, _getPrefixHandler(prefix));
-    }
-    return prefixHandlerCache.get(prefix);
-}
+const getPrefixHandler = memo(_getPrefixHandler);
 
 // This regex uses named capture groups to identify either a native CSS block OR a custom rule in one go.
 // (?<native_block>...) - Captures a native CSS block like `selector { body }`.
