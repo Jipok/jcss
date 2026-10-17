@@ -4,7 +4,7 @@
 
 No Node.js, bundler, CLI, or build step required.
 
-- **~14 KB brotli** — about **7.2× smaller** than the Tailwind CSS CDN runtime
+- **~14.4 KB brotli** — about **7.1× smaller** than the Tailwind CSS CDN runtime
 - About **4.5× faster** in a synthetic benchmark with 7,000 class candidates
 - About **6.9× smaller heap snapshot** in the same benchmark
 

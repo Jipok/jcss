@@ -667,6 +667,7 @@ const UTILITY_CONFIG = {
         $prop: 'grid-column',
         'auto': 'auto',
         $num: v => String(v), // For col-1, col-2, etc.
+        $arbitrary: true,
         'span': {
             $prop: 'grid-column',
             'full': '1 / -1',
@@ -690,6 +691,7 @@ const UTILITY_CONFIG = {
         $prop: 'grid-row',
             'auto': 'auto',
         $num: v => String(v), // For row-1, row-2, etc.
+        $arbitrary: true,
         'span': {
             $prop: 'grid-row',
             'full': '1 / -1',
@@ -1119,6 +1121,10 @@ const UTILITY_CONFIG = {
 
     // --- Lists ---
     'list': {
+        $arbitrary: (value, context) => {
+            context.$prop = 'list-style-type';
+            return value;
+        },
         'none': 'list-style-type: none',
         'disc': 'list-style-type: disc',
         'decimal': 'list-style-type: decimal',
@@ -1823,6 +1829,7 @@ const UTILITY_CONFIG = {
     },
     'cursor': {
         $prop: 'cursor',
+        $arbitrary: true,
         $values: [
             'auto', 'default', 'pointer', 'wait', 'text', 'move', 'help', 'not-allowed', 'none',
             'context-menu', 'progress', 'cell', 'crosshair', 'vertical-text', 'alias', 'copy',
@@ -1926,6 +1933,10 @@ const UTILITY_CONFIG = {
 
     // --- Content & Objects ---
     'object': {
+        $arbitrary: (value, context) => {
+            context.$prop = 'object-position';
+            return value;
+        },
         'contain': 'object-fit: contain',
         'cover': 'object-fit: cover',
         'fill': 'object-fit: fill',
