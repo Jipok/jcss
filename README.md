@@ -308,7 +308,7 @@ Configure J-CSS **before** loading the script:
 ```html
 <script>
   window.J = {
-    AutoDarkMode: true,   // Syncs the .dark class with the OS preference
+    AutoDarkMode: true,   // Syncs html.dark with the OS; false = toggle it yourself
     CSSClassMode: true,   // Generates CSS for utility classes found in the DOM
     CSSTagMode: true,     // Processes scoped <css> tags
     CSSWarnings: true,    // Warns in console about unrecognized utility classes

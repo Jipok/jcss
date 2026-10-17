@@ -6,6 +6,14 @@
 // =========================================================================
 
 const J = window.J = window.J || {};
+
+const cssWarn = (token, message) => {
+    if (
+        J.CSSWarnings !== false &&
+        (typeof J.CSSWarnings !== 'function' || J.CSSWarnings(token, message))
+    ) console.warn(message);
+};
+
 J.CleanDOM ??= true;
 J.CSSClassMode ??= true;
 J.CSSTagMode ??= true;
@@ -56,7 +64,7 @@ const colors = {
 const shadeKeys = ['50', '100', '200', '300', '400', '500', '600', '700', '800', '900', '950'];
 
 function hexToRgb(hex) {
-    const n = parseInt(hex.replace(/^#/, ''), 16);
+    const n = parseInt(hex.replace(/^#/, '').replace(/^(.)(.)(.)$/, '$1$1$2$2$3$3'), 16);
     return [n >> 16, (n >> 8) & 255, n & 255];
 }
 
@@ -170,8 +178,10 @@ function addColors(colors, prefix = '') {
 
         if (value && typeof value === 'object' && !Array.isArray(value)) {
             addColors(value, name);
-        } else if (name && /^#[\da-f]{6}$/i.test(value)) {
+        } else if (/^#([\da-f]{3}){1,2}$/i.test(value)) {
             colorMap.set(name, hexToRgb(value))
+        } else {
+            cssWarn(name, `[j-css] Color "${name}" skipped: use #rgb or #rrggbb, got "${value}"`)
         }
     }
 }
@@ -2015,13 +2025,6 @@ for (const ext of J.cssExtensions ?? []) {
     merge(UTILITY_CONFIG, ext.utilities);
     Object.assign(PREFIX_HANDLERS, ext.prefixes);
 }
-
-const cssWarn = (token, message) => {
-    if (
-        J.CSSWarnings !== false &&
-        (typeof J.CSSWarnings !== 'function' || J.CSSWarnings(token, message))
-    ) console.warn(message);
-};
 
 // =========================================================================
 // =========================================================================
