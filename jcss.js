@@ -2138,6 +2138,8 @@ function _resolveUtility(className) {
             // url(my__image.png)         → url(my_image.png)
             // var(--my__color)           → var(--my_color)
             .replace(/__|_/g, v => v === '__' ? '_' : ' ')
+            // CSS requires spaces around + and - inside math functions: calc(100%+8px) is invalid.
+            .replace(/(calc|min|max|clamp)\(([^()]*)\)/g, (m, fn, body) => `${fn}(${body.replace(/([\w)%])([+-])([\w(.])/g, "$1 $2 $3")})`)
         : remainingPath;
 
 
@@ -2409,7 +2411,9 @@ function generateCssFromRules(rules, scopeClass = null) {
                 // If the rule has a $base, add it to the SAME wrapper with all pseudo-classes,
                 // but wrap it in :where() to drop its specificity to 0
                 if (resolved.base) {
-                    const supportBaseSelector = `:where(${finalSelector})`;
+                    // Wrap each selector in :where() to drop its specificity, but keep any pseudo-element outside
+                    // (a pseudo-element inside :where() is invalid and would be dropped by the browser).
+                    const supportBaseSelector = selectorParts.map(p => p.replace(/^(.*?)(::.*)?$/, ':where($1)$2')).join(',');
                     if (!declarationsBySelectorByWrapper.has(supportBaseSelector)) {
                         declarationsBySelectorByWrapper.set(supportBaseSelector, new Set());
                     }
@@ -2635,7 +2639,7 @@ function compileCss(text, scopeClass) {
                         warnDocumentLevelScope(s, scopeClass);
                         return s.includes('&')
                             ? s.replaceAll('&', () => scopeClass)
-                            : `${scopeClass} ${s}`;
+                            : (s.startsWith('::') ? scopeClass : `${scopeClass} `) + s;
                     })
                     .join(', ');
                 nativeCssBlocks.push(`${scopedSelector} {${native_body}}`);
@@ -2666,6 +2670,8 @@ function compileCss(text, scopeClass) {
             // beginning is the selector. Everything after is a group prefix.
             // We start from `i > 0` because the very first part is always considered part of the selector.
             for (let i = selectorParts.length - 1; i > 0; i--) {
+                // An empty part means the selector contains '::' (e.g. `.box::after`); it is part of the selector.
+                if (selectorParts[i - 1] === '') break;
                 const part = selectorParts[i];
                 if (getPrefixHandler(part)) {
                     // This part is a valid prefix, so we continue checking the one before it.
